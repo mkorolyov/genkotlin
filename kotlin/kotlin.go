@@ -44,8 +44,7 @@ func Generate(sources map[string]astparser.ParsedFile) map[string][]byte {
 	for name, file := range sources {
 		f := File{
 			Classes: make([]Class, 0, len(file.Structs)),
-			//TODO pass valid package
-			Package: "test",
+			Package: file.Package,
 		}
 		for _, structDef := range file.Structs {
 			class := Class{

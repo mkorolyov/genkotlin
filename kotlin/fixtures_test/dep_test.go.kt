@@ -1,4 +1,4 @@
-package test
+package fixtures_test
 
 data class Dep1(
     
