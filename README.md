@@ -1,2 +1,2 @@
 # genkotlin
-Generate kaitlin classes from Go structs
+Generate kotlin classes from Go structs

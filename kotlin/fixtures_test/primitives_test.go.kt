@@ -2,31 +2,31 @@ package test
 
 data class PrimitivesV1(
     /** comment here */
-    val Int: Int,
+    val int: Int,
     
-    val Int64: Long,
+    val int64: Long,
     
-    val Float32: Float,
+    val float32: Float,
     
-    val Float64: Double,
+    val float64: Double,
     
-    val Bool: Boolean,
+    val bool: Boolean,
     
-    val String: String,
+    val string: String,
     
-    val Map: Map<String,String>,
+    val map: Map<String,String>,
     
-    val Slice: List<Int>,
+    val slice: List<Int>,
     
-    val MapOpt: Map<String,String>,
+    val mapOpt: Map<String,String>,
     
-    val MapWithNulls: Map<String,String>,
+    val mapWithNulls: Map<String,String>,
     
-    val SliceOpt: List<Int>,
+    val sliceOpt: List<Int>,
     
-    val Omitempty: Int,
+    val omitempty: Int,
     
-    val Ptr: Int
+    val ptr: Int
 ) { }
 
 

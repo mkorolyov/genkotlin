@@ -6,6 +6,7 @@ import (
 	"log"
 	"strings"
 	"text/template"
+	"unicode"
 
 	"github.com/mkorolyov/astparser"
 )
@@ -54,7 +55,7 @@ func Generate(sources map[string]astparser.ParsedFile) map[string][]byte {
 			//TODO data classes
 			for _, field := range structDef.Fields {
 				class.Fields = append(class.Fields, Field{
-					Name: field.FieldName,
+					Name: lowerCaseFirst(field.FieldName),
 					Type: parseType(field.FieldType),
 					Doc:  strings.Join(field.Comments, ", "),
 				})
@@ -110,6 +111,12 @@ func parseSimpleType(simple astparser.TypeSimple) string {
 	default:
 		panic(fmt.Sprintf("unknown go simple type %s", simple.Name))
 	}
+}
+
+func lowerCaseFirst(s string) string {
+	runes := []rune(s)
+	runes[0] = unicode.ToLower(runes[0])
+	return string(runes)
 }
 
 var isLastElemFn = template.FuncMap{
