@@ -33,7 +33,7 @@ type Field struct {
 }
 
 func Generate(sources map[string]astparser.ParsedFile) map[string][]byte {
-	temp := template.New("tmpl")
+	temp := template.New("tmpl").Funcs(isLastElemFn)
 	t, err := temp.Parse(tmpl)
 	if err != nil {
 		panic(fmt.Sprintf("failed to parse template: %v", err))
@@ -112,13 +112,19 @@ func parseSimpleType(simple astparser.TypeSimple) string {
 	}
 }
 
+var isLastElemFn = template.FuncMap{
+	// The name "isLastElem" is what the function will be called in the template text.
+	"isLastElem": func(len, i int) bool {
+		return len-1 == i
+	},
+}
+
 //TODO imports
-//TODO trailing comma after last field
 const tmpl = `package {{$.Package}}
 {{ range $class := .Classes}}
 data class {{$class.Name}}({{ range $index, $element := $class.Fields }}
     {{if $element.Doc}}/** {{$element.Doc}} */{{end}}
-    val {{$element.Name}}: {{$element.Type}}{{if not (eq $index ((len $class.Fields) -1))}},{{end}}{{end}}
+    val {{$element.Name}}: {{$element.Type}}{{if not (isLastElem (len $class.Fields) $index)}},{{end}}{{end}}
 ) { }
 {{ range $class.DataClasses}}
 data class {{$.Name}}(val value: {{$.Type}}){{end}}

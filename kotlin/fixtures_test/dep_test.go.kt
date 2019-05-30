@@ -2,37 +2,37 @@ package test
 
 data class Dep1(
     
-    val Str: String,
+    val Str: String
 ) { }
 
 
 data class Dep2(
     
-    val Str: String,
+    val Str: String
 ) { }
 
 
 data class Dep3(
     
-    val Str: String,
+    val Str: String
 ) { }
 
 
 data class Dep4(
     
-    val Str: String,
+    val Str: String
 ) { }
 
 
 data class Dep5(
     
-    val Str: String,
+    val Str: String
 ) { }
 
 
 data class Dep6(
     
-    val Dep5: Dep5,
+    val Dep5: Dep5
 ) { }
 
 
@@ -48,13 +48,13 @@ data class Dep(
     
     val Dep4Map: Map<String,Dep4>,
     
-    val DepWithDep: Dep6,
+    val DepWithDep: Dep6
 ) { }
 
 
 data class Optional(
     
-    val Int: Int,
+    val Int: Int
 ) { }
 
 
@@ -62,7 +62,7 @@ data class StructV1(
     
     val Dep: Dep,
     
-    val Optional: Optional,
+    val Optional: Optional
 ) { }
 
 

@@ -26,7 +26,7 @@ data class PrimitivesV1(
     
     val Omitempty: Int,
     
-    val Ptr: Int,
+    val Ptr: Int
 ) { }
 
 
