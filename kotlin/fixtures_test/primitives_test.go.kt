@@ -18,15 +18,15 @@ data class PrimitivesV1(
     
     val slice: List<Int>,
     
-    val mapOpt: Map<String,String>,
+    val mapOpt: Map<String,String>?,
     
     val mapWithNulls: Map<String,String>,
     
-    val sliceOpt: List<Int>,
+    val sliceOpt: List<Int>?,
     
-    val omitempty: Omitempty,
+    val omitempty: Omitempty?,
     
-    val ptr: Int
+    val ptr: Int?
 ) {
     data class Int(val value: Int)
     data class Int64(val value: Long)

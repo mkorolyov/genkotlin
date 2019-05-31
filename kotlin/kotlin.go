@@ -28,9 +28,10 @@ type DataClass struct {
 }
 
 type Field struct {
-	Name string
-	Doc  string
-	Type string
+	Name     string
+	Doc      string
+	Type     string
+	Optional bool
 }
 
 func Generate(sources map[string]astparser.ParsedFile) map[string][]byte {
@@ -53,9 +54,10 @@ func Generate(sources map[string]astparser.ParsedFile) map[string][]byte {
 			}
 			for _, fieldDef := range structDef.Fields {
 				field := Field{
-					Name: lowerCaseFirst(fieldDef.FieldName),
-					Type: parseType(fieldDef.FieldType),
-					Doc:  strings.Join(fieldDef.Comments, ", "),
+					Name:     lowerCaseFirst(fieldDef.FieldName),
+					Type:     parseType(fieldDef.FieldType),
+					Doc:      strings.Join(fieldDef.Comments, ", "),
+					Optional: fieldDef.Nullable,
 				}
 				class.addDataClass(fieldDef, &field)
 				class.Fields = append(class.Fields, field)
@@ -92,7 +94,6 @@ func parseType(t astparser.Type) string {
 	case astparser.TypeMap:
 		return fmt.Sprintf("Map<%s,%s>", parseType(v.KeyType), parseType(v.ValueType))
 	case astparser.TypePointer:
-		//TODO handle optional
 		return parseType(v.InnerType)
 	case astparser.TypeCustom:
 		//TODO handle dependency
@@ -143,7 +144,7 @@ const tmpl = `package {{$.Package}}
 {{ range $class := .Classes}}
 data class {{$class.Name}}({{ range $index, $element := $class.Fields }}
     {{if $element.Doc}}/** {{$element.Doc}} */{{end}}
-    val {{$element.Name}}: {{$element.Type}}{{if not (isLastElem (len $class.Fields) $index)}},{{end}}{{end}}
+    val {{$element.Name}}: {{$element.Type}}{{if $element.Optional}}?{{end}}{{if not (isLastElem (len $class.Fields) $index)}},{{end}}{{end}}
 ){{if $class.DataClasses}} {
 {{ range $dc := $class.DataClasses}}    data class {{$dc.Name}}(val value: {{$dc.Type}})
 {{end}}

@@ -51,11 +51,11 @@ data class Dep(
     
     val dep1: Dep1,
     
-    val dep2Opt: Dep2,
+    val dep2Opt: Dep2?,
     
-    val dep3Array: List<Dep3>,
+    val dep3Array: List<Dep3>?,
     
-    val dep4Map: Map<String,Dep4>,
+    val dep4Map: Map<String,Dep4>?,
     
     val depWithDep: Dep6
 ) {
