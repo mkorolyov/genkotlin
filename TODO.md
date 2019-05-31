@@ -2,7 +2,7 @@
 
 - [ ] Custom tags?
 - [ ] Support enums
-- [ ] Add data class generation for simple types
+- [X] Add data class generation for simple types
 - [X] Pass valid package for generated files
 - [ ] Support optional fields
 - [ ] Fill imports to generated file

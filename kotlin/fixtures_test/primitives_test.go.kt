@@ -4,13 +4,13 @@ data class PrimitivesV1(
     /** comment here */
     val int: Int,
     
-    val int64: Long,
+    val int64: Int64,
     
-    val float32: Float,
+    val float32: Float32,
     
-    val float64: Double,
+    val float64: Float64,
     
-    val bool: Boolean,
+    val bool: Bool,
     
     val string: String,
     
@@ -24,9 +24,17 @@ data class PrimitivesV1(
     
     val sliceOpt: List<Int>,
     
-    val omitempty: Int,
+    val omitempty: Omitempty,
     
     val ptr: Int
-) { }
+) {
+    data class Int(val value: Int)
+    data class Int64(val value: Long)
+    data class Float32(val value: Float)
+    data class Float64(val value: Double)
+    data class Bool(val value: Boolean)
+    data class String(val value: String)
+    data class Omitempty(val value: Int)
 
+}
 

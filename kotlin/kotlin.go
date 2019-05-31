@@ -51,13 +51,14 @@ func Generate(sources map[string]astparser.ParsedFile) map[string][]byte {
 				Name:   structDef.Name,
 				Fields: make([]Field, 0, len(structDef.Fields)),
 			}
-			//TODO data classes
-			for _, field := range structDef.Fields {
-				class.Fields = append(class.Fields, Field{
-					Name: lowerCaseFirst(field.FieldName),
-					Type: parseType(field.FieldType),
-					Doc:  strings.Join(field.Comments, ", "),
-				})
+			for _, fieldDef := range structDef.Fields {
+				field := Field{
+					Name: lowerCaseFirst(fieldDef.FieldName),
+					Type: parseType(fieldDef.FieldType),
+					Doc:  strings.Join(fieldDef.Comments, ", "),
+				}
+				class.addDataClass(fieldDef, &field)
+				class.Fields = append(class.Fields, field)
 			}
 			f.Classes = append(f.Classes, class)
 		}
@@ -68,6 +69,18 @@ func Generate(sources map[string]astparser.ParsedFile) map[string][]byte {
 		result[name] = data.Bytes()
 	}
 	return result
+}
+
+func (class *Class) addDataClass(fieldDef astparser.FieldDef, field *Field) {
+	simpleTypeDef, ok := fieldDef.FieldType.(astparser.TypeSimple)
+	if !ok {
+		return
+	}
+
+	field.Type = fieldDef.FieldName
+
+	simpleType := parseSimpleType(simpleTypeDef)
+	class.DataClasses = append(class.DataClasses, DataClass{Name: fieldDef.FieldName, Type: simpleType})
 }
 
 func parseType(t astparser.Type) string {
@@ -82,7 +95,7 @@ func parseType(t astparser.Type) string {
 		//TODO handle optional
 		return parseType(v.InnerType)
 	case astparser.TypeCustom:
-		//TODO handle dependency, data class
+		//TODO handle dependency
 		return v.Name
 	default:
 		panic(fmt.Sprintf("unknown type %+[1]v: %[1]T", t))
@@ -131,8 +144,9 @@ const tmpl = `package {{$.Package}}
 data class {{$class.Name}}({{ range $index, $element := $class.Fields }}
     {{if $element.Doc}}/** {{$element.Doc}} */{{end}}
     val {{$element.Name}}: {{$element.Type}}{{if not (isLastElem (len $class.Fields) $index)}},{{end}}{{end}}
-) { }
-{{ range $class.DataClasses}}
-data class {{$.Name}}(val value: {{$.Type}}){{end}}
+){{if $class.DataClasses}} {
+{{ range $dc := $class.DataClasses}}    data class {{$dc.Name}}(val value: {{$dc.Type}})
+{{end}}
+}{{else}} { }{{end}}
 {{end}}
 `
