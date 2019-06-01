@@ -4,37 +4,30 @@ import (
 	"bytes"
 	"fmt"
 	"log"
-	"strings"
 	"text/template"
-	"unicode"
 
 	"github.com/mkorolyov/astparser"
 )
 
-type File struct {
-	Classes []Class
-	Package string
+type Generator struct {
+	fieldNameConverter fieldNameConverter
 }
 
-type Class struct {
-	Name        string
-	Fields      []Field
-	DataClasses []DataClass
+type Config struct {
+	UseJsonTagNames bool
 }
 
-type DataClass struct {
-	Name string
-	Type string
+func NewGenerator(cfg Config) *Generator {
+	generator := &Generator{
+		fieldNameConverter: defaultFieldNameConverter,
+	}
+	if cfg.UseJsonTagNames {
+		generator.fieldNameConverter = jsonTagFieldNameConverter
+	}
+	return generator
 }
 
-type Field struct {
-	Name     string
-	Doc      string
-	Type     string
-	Optional bool
-}
-
-func Generate(sources map[string]astparser.ParsedFile) map[string][]byte {
+func(g *Generator) Generate(sources map[string]astparser.ParsedFile) map[string][]byte {
 	temp := template.New("tmpl").Funcs(isLastElemFn)
 	t, err := temp.Parse(tmpl)
 	if err != nil {
@@ -53,12 +46,7 @@ func Generate(sources map[string]astparser.ParsedFile) map[string][]byte {
 				Fields: make([]Field, 0, len(structDef.Fields)),
 			}
 			for _, fieldDef := range structDef.Fields {
-				field := Field{
-					Name:     lowerCaseFirst(fieldDef.FieldName),
-					Type:     parseType(fieldDef.FieldType),
-					Doc:      strings.Join(fieldDef.Comments, ", "),
-					Optional: fieldDef.Nullable,
-				}
+				field := convertField(fieldDef, g.fieldNameConverter)
 				class.addDataClass(fieldDef, &field)
 				class.Fields = append(class.Fields, field)
 			}
@@ -125,29 +113,3 @@ func parseSimpleType(simple astparser.TypeSimple) string {
 		panic(fmt.Sprintf("unknown go simple type %s", simple.Name))
 	}
 }
-
-func lowerCaseFirst(s string) string {
-	runes := []rune(s)
-	runes[0] = unicode.ToLower(runes[0])
-	return string(runes)
-}
-
-var isLastElemFn = template.FuncMap{
-	// The name "isLastElem" is what the function will be called in the template text.
-	"isLastElem": func(len, i int) bool {
-		return len-1 == i
-	},
-}
-
-//TODO imports
-const tmpl = `package {{$.Package}}
-{{ range $class := .Classes}}
-data class {{$class.Name}}({{ range $index, $element := $class.Fields }}
-    {{if $element.Doc}}/** {{$element.Doc}} */{{end}}
-    val {{$element.Name}}: {{$element.Type}}{{if $element.Optional}}?{{end}}{{if not (isLastElem (len $class.Fields) $index)}},{{end}}{{end}}
-){{if $class.DataClasses}} {
-{{ range $dc := $class.DataClasses}}    data class {{$dc.Name}}(val value: {{$dc.Type}})
-{{end}}
-}{{else}} { }{{end}}
-{{end}}
-`

@@ -18,7 +18,8 @@ func TestGenerate(t *testing.T) {
 	sources, err := astparser.Load(cfg)
 	require.NoError(t, err)
 
-	files := Generate(sources)
+	generator := NewGenerator(Config{})
+	files := generator.Generate(sources)
 	for name, got := range files {
 		want, err := ioutil.ReadFile(
 			fmt.Sprintf("fixtures_test/%s.kt", name))

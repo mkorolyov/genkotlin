@@ -6,6 +6,7 @@
 - [X] Pass valid package for generated files
 - [X] Support optional fields
 - [ ] Fill imports to generated file
+- [X] Use json tag as field name
 - [X] First letter in field name should be in lower case
 - [X] Remove trailing comma in field list
 - [X] Simple implementation
